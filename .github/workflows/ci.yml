@@ -21,4 +21,4 @@ jobs:
           distribution: 'temurin'
 
       - name: Ejecutar pruebas
-        run: mvn test
+        run: cd proyecto-pruebas && mvn test
