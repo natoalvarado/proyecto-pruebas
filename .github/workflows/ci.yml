@@ -24,12 +24,7 @@ jobs:
         run: cd proyecto-pruebas && mvn test
 
       - name: Instalar k6
-        run: |
-          sudo gpg -k
-          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C780D0BDB1A69C86A7E8E3A93C612D5F8B42A16C
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update
-          sudo apt-get install k6
+        uses: grafana/setup-k6-action@v1
 
       - name: Ejecutar prueba de performance
         run: k6 run performance/login-test.js
