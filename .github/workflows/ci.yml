@@ -1,0 +1,83 @@
+name: CI - Automatizacion de Pruebas
+
+on:
+  push:
+    branches:
+      - feature/examen-final
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  build:
+    name: Compilacion
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: proyecto-pruebas/pom.xml
+
+      - name: Compilar proyecto
+        working-directory: proyecto-pruebas
+        run: mvn --batch-mode clean compile
+
+  unit-tests:
+    name: Pruebas unitarias
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: proyecto-pruebas/pom.xml
+
+      - name: Ejecutar pruebas unitarias
+        working-directory: proyecto-pruebas
+        run: mvn --batch-mode clean test
+
+  integration-tests:
+    name: Pruebas de integracion
+    needs: unit-tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: proyecto-pruebas/pom.xml
+
+      - name: Ejecutar pruebas de integracion
+        working-directory: proyecto-pruebas
+        run: mvn --batch-mode clean verify
+
+      - name: Publicar reportes de pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reportes-pruebas
+          path: |
+            proyecto-pruebas/target/surefire-reports/
+            proyecto-pruebas/target/failsafe-reports/
